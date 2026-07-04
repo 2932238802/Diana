@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://0o75n43ttagw"]
+
+[ext_resource type="Script" uid="uid://1lon77dx1ef1" path="res://features/player/LosPlayer.gd" id="1_hjaqi"]
+[ext_resource type="Texture2D" uid="uid://cbsmvb2a3h6ye" path="res://icon.svg" id="1_xo3ru"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4qnqm"]
+radius = 30.0
+
+[node name="Player" type="CharacterBody2D" unique_id=1471018953]
+script = ExtResource("1_hjaqi")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1766890903]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_xo3ru")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=984592833]
+shape = SubResource("CircleShape2D_4qnqm")

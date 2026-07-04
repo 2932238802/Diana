@@ -1,0 +1,119 @@
+[gd_scene format=3 uid="uid://wmdghlh3c27u"]
+
+[ext_resource type="Script" uid="uid://keyyjttjn25s" path="res://ui/hud/LosHud.gd" id="1_0awor"]
+
+[sub_resource type="StyleBoxFlat" id="Style_Panel"]
+bg_color = Color(0.078, 0.071, 0.063, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.29, 0.184, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="Style_BarBG"]
+bg_color = Color(0, 0, 0, 0.5)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_HPFill"]
+bg_color = Color(0.886, 0.235, 0.235, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_EnergyFill"]
+bg_color = Color(0.961, 0.816, 0.125, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="HUD" type="CanvasLayer" unique_id=1784031789]
+script = ExtResource("1_0awor")
+
+[node name="Panel" type="Panel" parent="." unique_id=2144321668]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 300.0
+offset_bottom = 190.0
+theme_override_styles/panel = SubResource("Style_Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel" unique_id=73375021]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = -14.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="FloorLabel" type="Label" parent="Panel/VBox" unique_id=1682735276]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.941, 0.776, 0.455, 1)
+theme_override_font_sizes/font_size = 16
+text = "🏰 第 1 层"
+
+[node name="HPTitle" type="Label" parent="Panel/VBox" unique_id=752540636]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.847, 0.8, 0.733, 1)
+theme_override_font_sizes/font_size = 12
+text = "生命"
+
+[node name="HPBar" type="ProgressBar" parent="Panel/VBox" unique_id=853210503]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("Style_BarBG")
+theme_override_styles/fill = SubResource("Style_HPFill")
+value = 100.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="Panel/VBox/HPBar" unique_id=2005789999]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyTitle" type="Label" parent="Panel/VBox" unique_id=398241425]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.847, 0.8, 0.733, 1)
+theme_override_font_sizes/font_size = 12
+text = "能量"
+
+[node name="EnergyBar" type="ProgressBar" parent="Panel/VBox" unique_id=1534374216]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("Style_BarBG")
+theme_override_styles/fill = SubResource("Style_EnergyFill")
+value = 100.0
+show_percentage = false
+
+[node name="EnergyLabel" type="Label" parent="Panel/VBox/EnergyBar" unique_id=345728197]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
