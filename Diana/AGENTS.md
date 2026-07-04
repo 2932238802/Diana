@@ -68,17 +68,24 @@
 
 ## 4. 目录结构
 
-### 4.1 当前实际结构（旧，待重构）
+> **⚠️ 项目已迁移！当前根目录 = `D:\PR\Diana\Diana`（project.godot 所在层）。已建 git 仓库。**
+
+### 4.1 当前实际结构（已按功能模块重构完成 ✅）
 ```
-D:\LosAngelous\Los\Diana\Diana\
+D:\PR\Diana\Diana\
 ├── AGENTS.md
 ├── project.godot
 ├── icon.svg
-├── scripts/             ← camera.gd, player.gd
-├── scene/               ← level.tscn, player.tscn（注意：单数 scene）
-├── src/                 ← C++ 源代码（空，未来 GDExtension）
-├── content/             ← Lua 配置（待建）
-└── assets/              ← 美术资源（待建）
+├── hud_prototype.html   ← 血条HTML原型（可删）
+├── autoload/            ← LosRouter.gd（事件总线）, LosPlayerState.gd（状态单例）
+├── features/
+│   └── player/          ← LosPlayer.tscn/.gd, bullet.tscn（+待建 LosBullet.gd）
+├── levels/              ← level.tscn
+├── systems/             ← camera.gd
+├── ui/
+│   └── hud/             ← LosHud.tscn, LosHud.gd
+├── (features/inventory,crafting,shop,skills,events 空文件夹待用)
+└── (assets/, src/, content/ 待用)
 ```
 
 ### 4.2 🎯 目标结构（按功能模块组织，2026-07-04 规划，待迁移）
@@ -136,6 +143,9 @@ res://
 - **明确分工（作者 2026-07-04 定）**：
   - **`.gd` 脚本代码 → 作者本人写**（AI 只讲原理、答疑、review，绝不代写脚本）
   - **`.tscn` 场景 / UI 配置 → AI 改**（节点结构、坐标、颜色、输入映射等配置性工作）
+- **讲解代码时必须标注"写在哪个文件"（作者要求）**：
+  每段代码前明确说明它属于哪个文件的实际路径（如"👉 写在 `features/player/LosPlayer/LosPlayer.gd`"），
+  避免作者把代码写错文件。
 - **以教学引导为主**：作者想边学边做。讲清楚"该建什么、怎么设计、为什么这样写"，
   让作者**自己动手写**；不要直接甩完整代码。
 - 给移动/逻辑时，**给"零件"和思路，不给完整答案**，除非作者明确说"你来写/你帮我改"。

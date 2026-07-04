@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cbd42h67rkeke"]
+
+[ext_resource type="Script" uid="uid://b6ts8bv2u4lmt" path="res://features/enemy/LosEnemy/LosEnemy.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cpb1uyc7t7ws4" path="res://assets/sprites/xg_1.png" id="2_tex"]
+
+[sub_resource type="CircleShape2D" id="Shape_Enemy"]
+radius = 45.0
+
+[node name="LosEnemy" type="CharacterBody2D" unique_id=1822854254 groups=["enemy"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=54337989]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1506125669]
+shape = SubResource("Shape_Enemy")
