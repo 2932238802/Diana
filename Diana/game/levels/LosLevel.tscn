@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://qy7bu7nx8a8k"]
+
+[ext_resource type="Script" uid="uid://b3barj1rvpvcf" path="res://game/levels/LosLevel.gd" id="1_6ffw3"]
+[ext_resource type="PackedScene" uid="uid://wmdghlh3c27u" path="res://game/ui/LosHud/LosHud.tscn" id="1_gykle"]
+[ext_resource type="PackedScene" uid="uid://0o75n43ttagw" path="res://game/features/player/LosPlayer/LosPlayer.tscn" id="2_6ffw3"]
+[ext_resource type="Script" uid="uid://5n8gf5ww108a" path="res://game/systems/LosCamera.gd" id="3_m4jom"]
+
+[sub_resource type="RectangleShape2D" id="Shape_TopBottom"]
+size = Vector2(2480, 40)
+
+[sub_resource type="RectangleShape2D" id="Shape_LeftRight"]
+size = Vector2(40, 1880)
+
+[node name="Level" type="Node2D" unique_id=1772159285]
+script = ExtResource("1_6ffw3")
+
+[node name="State" parent="." unique_id=1784031789 instance=ExtResource("1_gykle")]
+
+[node name="LosPlayer" parent="." unique_id=1471018953 instance=ExtResource("2_6ffw3")]
+position = Vector2(0, 200)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=200000001]
+script = ExtResource("3_m4jom")
+
+[node name="Walls" type="Node2D" parent="." unique_id=100000001]
+
+[node name="WallTop" type="StaticBody2D" parent="Walls" unique_id=100000002]
+position = Vector2(0, -920)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallTop" unique_id=100000003]
+shape = SubResource("Shape_TopBottom")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/WallTop" unique_id=100000004]
+color = Color(0.4, 0.25, 0.15, 1)
+polygon = PackedVector2Array(-1240, -20, 1240, -20, 1240, 20, -1240, 20)
+
+[node name="WallBottom" type="StaticBody2D" parent="Walls" unique_id=100000005]
+position = Vector2(0, 920)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallBottom" unique_id=100000006]
+shape = SubResource("Shape_TopBottom")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/WallBottom" unique_id=100000007]
+color = Color(0.4, 0.25, 0.15, 1)
+polygon = PackedVector2Array(-1240, -20, 1240, -20, 1240, 20, -1240, 20)
+
+[node name="WallLeft" type="StaticBody2D" parent="Walls" unique_id=100000008]
+position = Vector2(-1220, 0)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallLeft" unique_id=100000009]
+shape = SubResource("Shape_LeftRight")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/WallLeft" unique_id=100000010]
+color = Color(0.4, 0.25, 0.15, 1)
+polygon = PackedVector2Array(-20, -940, 20, -940, 20, 940, -20, 940)
+
+[node name="WallRight" type="StaticBody2D" parent="Walls" unique_id=100000011]
+position = Vector2(1220, 0)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallRight" unique_id=100000012]
+shape = SubResource("Shape_LeftRight")
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/WallRight" unique_id=100000013]
+color = Color(0.4, 0.25, 0.15, 1)
+polygon = PackedVector2Array(-20, -940, 20, -940, 20, 940, -20, 940)
+
+[node name="LosLua" type="LosLua" parent="." unique_id=1609771215]

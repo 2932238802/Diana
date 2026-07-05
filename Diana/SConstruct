@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+import os
+
+env = SConscript("src/godot-cpp/SConstruct")
+
+env.Append(CPPPATH=["src/Diana/", "src/Lua/"])
+
+sources = Glob("src/Diana/*.cpp") + Glob("src/Diana/**/*.cpp") + Glob("src/Lua/*.c")
+
+(extension_name, extension_target) = ("diana", "template_debug")
+
+if env["platform"] == "windows":
+    library = env.SharedLibrary(
+        "bin/libdiana.{}.{}.{}{}".format(
+            env["platform"], env["target"], env["arch"], env["SHLIBSUFFIX"]
+        ),
+        source=sources,
+    )
+else:
+    library = env.SharedLibrary(
+        "bin/libdiana.{}.{}.{}{}".format(
+            env["platform"], env["target"], env["arch"], env["SHLIBSUFFIX"]
+        ),
+        source=sources,
+    )
+
+Default(library)

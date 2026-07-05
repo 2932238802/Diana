@@ -1,0 +1,166 @@
+[gd_scene format=3 uid="uid://cbd42h67rkeke"]
+
+[ext_resource type="Script" uid="uid://b6ts8bv2u4lmt" path="res://game/features/enemy/LosEnemy/LosEnemy.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cc0q3uhlusrv5" path="res://game/assets/monster/mon_1.png" id="2_0vcti"]
+
+[sub_resource type="CircleShape2D" id="Shape_Enemy"]
+radius = 17.029387
+
+[sub_resource type="StyleBoxFlat" id="Style_HPBG"]
+bg_color = Color(0, 0, 0, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="Style_HPFill"]
+bg_color = Color(0.886, 0.235, 0.235, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_maaqg"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(0, 50, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xl4av"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(50, 50, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dawei"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(100, 50, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6sclu"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(50, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fhg1o"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(100, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5lhv1"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(150, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hmjiq"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(200, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ccsir"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(0, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t6tjx"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(50, 100, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_20us4"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(0, 0, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_302xg"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(50, 0, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tmju5"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(100, 0, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qn202"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(150, 0, 50, 50)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4m6ge"]
+atlas = ExtResource("2_0vcti")
+region = Rect2(200, 0, 50, 50)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8swo8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_maaqg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xl4av")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dawei")
+}],
+"loop": 0,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6sclu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fhg1o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5lhv1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hmjiq")
+}],
+"loop": 0,
+"name": &"die",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ccsir")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t6tjx")
+}],
+"loop": 0,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_20us4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_302xg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tmju5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qn202")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4m6ge")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[node name="LosEnemy" type="CharacterBody2D" unique_id=1822854254 groups=["enemy"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1506125669]
+shape = SubResource("Shape_Enemy")
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=600000001]
+visible = false
+offset_left = -40.0
+offset_top = -75.0
+offset_right = 40.0
+offset_bottom = -65.0
+theme_override_styles/background = SubResource("Style_HPBG")
+theme_override_styles/fill = SubResource("Style_HPFill")
+value = 100.0
+show_percentage = false
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1921327569]
+position = Vector2(1, -1)
+sprite_frames = SubResource("SpriteFrames_8swo8")
+animation = &"attack"

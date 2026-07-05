@@ -62,7 +62,26 @@
 - **反面教材（禁止）**：一上来就用 C++ 写血条、Lua 写菜单 = 过度设计
 - **引入顺序 = 优秀工程师的决策故事**：GDScript 快速验证 → Lua 解耦内容 → C++ 优化性能
 
-> 注意：C++ 目前**暂不动手**。先用纯 GDScript 把游戏原型跑通。
+### 🔥 重大决策变更（2026-07-05）：作者选择提前搭 C++ GDExtension + Lua 底座（路线A）
+- **背景**：作者铁了心要"硬核技术经历"，趁架构小提前把 C++/Lua 技术地基打好，避免以后大改。
+  接受"搭环境期间游戏逻辑暂停几天"的代价。AI 已充分提示利弊，作者坚持路线A。
+- **作者环境**：C++ 编译环境已具备 ✅
+- **推进阶段（每步跑通再下一步）**：
+  1. 搭 C++ 环境 + 编译出 Hello World GDExtension（godot-cpp + SCons + .dll，最难的环境关）
+  2. C++ 里集成 Lua（LuaJIT/Lua 源码），跑通"C++ 读 .lua 文件"
+  3. 敌人/关卡数据用 Lua 写，GDScript 经 C++ 读取（数据驱动）
+  4. 回到游戏逻辑，用这套系统刷怪
+- **面试价值**：自建 GDExtension + Lua 数据驱动框架 = 实打实硬核亮点
+- **注意**：C++ 代码放 `src/`；此决策覆盖前面"C++暂不动手"的说明
+
+> ~~注意：C++ 目前暂不动手~~（已被上述路线A决策覆盖）
+
+### 📁 C++ / 构建目录约定（2026-07-05 定）
+- **`scripts/`** = 脚本构建目录（放 SConstruct 等构建脚本）
+- **`src/godot-cpp/`** = 官方 C++ 绑定库（4.4分支，已编译出 bin/libgodot-cpp.windows.template_debug.x86_64.lib）
+- **`src/Diana/`** = 作者自己的 C++ 项目源码（GDExtension 类写这里）
+- extension_api.json 已用 Godot 4.7 重新导出（--dump-extension-api），API 匹配 4.7
+- 环境：Python 3.13 / SCons 4.10 / MSVC(VS in F:\VisualStdio) / Godot 4.7 (F:\Godot)
 
 ---
 
@@ -140,9 +159,11 @@ res://
 - **Godot / GDScript**：**不熟练**，正在学习中 ⚠️
 
 ### 教学协作规范（务必遵守）
-- **明确分工（作者 2026-07-04 定）**：
-  - **`.gd` 脚本代码 → 作者本人写**（AI 只讲原理、答疑、review，绝不代写脚本）
-  - **`.tscn` 场景 / UI 配置 → AI 改**（节点结构、坐标、颜色、输入映射等配置性工作）
+- **明确分工（作者 2026-07-04 定，2026-07-05 再次强调）**：
+  - **只有 `.tscn` 场景 / UI 配置 → AI 可直接修改**（节点结构、坐标、颜色、输入映射等）
+  - **其他所有代码 → 作者本人写**：`.gd`(GDScript)、`.cpp/.h`(C++)、`.lua`、SConstruct、.gdextension 等
+	AI 只讲原理、给代码内容供参考、答疑、review，**绝不直接写入这些文件**
+  - ⚠️ AI 曾误直接写 C++ 文件，作者已纠正。**除 .tscn 外一律不动手写文件**
 - **讲解代码时必须标注"写在哪个文件"（作者要求）**：
   每段代码前明确说明它属于哪个文件的实际路径（如"👉 写在 `features/player/LosPlayer/LosPlayer.gd`"），
   避免作者把代码写错文件。
@@ -201,6 +222,41 @@ res://
 
 ### 📌 已清理
 - player.gd 分号已删除 ✅
+
+### ✅ 已完成（Los 前缀版，最新进度）🎉
+- **状态系统**：LosPlayerState(数据单例) + LosRouter(事件总线,ls_health_changed信号) + LosHud(订阅信号更新血条/能量条)。数据→总线→UI 三层解耦
+- **相机**：LosCamera.gd 挂 Level 独立 Camera2D，空格归位 + 鼠标贴边滚屏(MOBA式)
+- **射击**：按住A瞄准→左键射击(点射/连射fire_timer)；LosBullet(Area2D)飞行+超距/撞击消失；instantiate动态生成加到Level
+- **敌人+战斗循环**：LosEnemy追踪AI(找player组)+防贴脸(L_stopDistance)；alterHealth(正回负扣)→die；子弹撞enemy组→扣血→死亡。**核心战斗打通！**
+
+### ⚠️⚠️ 重大坑记录（务必记住）
+1. **碰撞层(collision_layer/mask)必须在 Godot Inspector 里设！** AI 在外部改 tscn 的碰撞层会被 Godot 重新保存覆盖。敌人 Layer=第3格(enemy)/Mask=第2格(Wall)
+2. 多实例不设 position 会都在(0,0)重叠 → 曾造成"敌人贴脸甩不掉"假象
+3. groups：玩家=["player"]，敌人=["enemy"]，用 is_in_group 识别
+4. @export 值被 tscn 保存值覆盖，改脚本默认值不生效时去 Inspector 改
+5. 命名统一 Los 前缀：LosPlayer/LosEnemy/LosBullet/LosHud/LosCamera/LosRouter/LosPlayerState/LosLevel
+
+### ⏳ 真·下一步计划（覆盖上面旧列表）
+1. **敌人血条**（受击显示，2秒无伤害自动隐藏，红色无数字）← 进行中
+2. 敌人发子弹打玩家（联动 HUD 扣血）
+3. 刷怪器（生成多个敌人）
+4. 武器掉落 → 层间提升点选择
+5. 主菜单 game.tscn + 场景切换
+6. Lua 数据驱动（武器多了之后）
+7. C++ GDExtension（性能瓶颈时）
+8. 待美化：瞄准虚线、怪物图抠白底、UI Theme
+
+### 🏗️ 关卡/敌人架构决策（2026-07-05，作者主动提出，重要！）
+- **关卡管理器 LosLevel.gd**（挂 LosLevel.tscn 根节点=当前关卡总指挥，每关重建）
+  vs **LosPlayerState 单例**（跨关卡持久数据：层数L_currentLevel/血量）—— 职责分离
+- **一个 LosLevel.tscn 模板反复重载**，不做999个场景。每次 _ready 读 LosPlayerState.L_currentLevel 决定刷什么
+- **清怪判定用"管理器持有敌人列表 L_enemies"**（不用全局组遍历，性能好、归属清晰、契合海量敌人目标）；
+  组(enemy)仅保留用于子弹碰撞识别(is_in_group)。用 filter+is_instance_valid 清理已死敌人再计数
+- **刷怪用数组 `@export var L_enemyScenes: Array[PackedScene]`**（不是每种怪一个变量！），pick_random 随机刷。
+  加新怪=往数组拖，代码不动。终极形态=Lua敌人属性表+关卡刷怪表（种类多了再上）
+- 刷怪数量现用简单公式（如 2+层数），将来抽到 Lua 数据
+- 敌人 die() 里：remove_from_group("enemy") + LosRouter.ls_enemy_died.emit(get_instance_id(), L_currentLevel)
+- **作者架构意识强**：已主动预判"关卡数据如何反映""敌人种类如何扩展"等扩展性问题
 
 ---
 

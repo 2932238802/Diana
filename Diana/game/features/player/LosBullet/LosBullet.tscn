@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://ddyx2d4hcrab5"]
+
+[ext_resource type="Script" uid="uid://j14roy2k4b0c" path="res://game/features/player/LosBullet/LosBullet.gd" id="1_6x1ln"]
+
+[sub_resource type="CircleShape2D" id="Shape_Bullet"]
+radius = 8.0
+
+[node name="Bullet" type="Area2D" unique_id=1066354031]
+collision_layer = 8
+collision_mask = 6
+script = ExtResource("1_6x1ln")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1109595314]
+color = Color(0.961, 0.816, 0.125, 1)
+polygon = PackedVector2Array(8, 0, 5.66, 5.66, 0, 8, -5.66, 5.66, -8, 0, -5.66, -5.66, 0, -8, 5.66, -5.66)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=790400012]
+shape = SubResource("Shape_Bullet")

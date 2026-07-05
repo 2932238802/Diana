@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://0o75n43ttagw"]
+
+[ext_resource type="Script" uid="uid://1lon77dx1ef1" path="res://game/features/player/LosPlayer/LosPlayer.gd" id="1_hjaqi"]
+[ext_resource type="Texture2D" uid="uid://cbsmvb2a3h6ye" path="res://icon.svg" id="1_xo3ru"]
+[ext_resource type="PackedScene" uid="uid://ddyx2d4hcrab5" path="res://game/features/player/LosBullet/LosBullet.tscn" id="2_h0o2h"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4qnqm"]
+radius = 30.0
+
+[node name="Player" type="CharacterBody2D" unique_id=1471018953 groups=["player"]]
+collision_mask = 2
+script = ExtResource("1_hjaqi")
+L_bulletScene = ExtResource("2_h0o2h")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1766890903]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_xo3ru")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=984592833]
+shape = SubResource("CircleShape2D_4qnqm")
+
+[node name="AimLine" type="Line2D" parent="." unique_id=555000001]
+visible = false
+points = PackedVector2Array(0, 0, 100, 0)
+width = 1.0
+default_color = Color(1, 1, 1, 0.4)
