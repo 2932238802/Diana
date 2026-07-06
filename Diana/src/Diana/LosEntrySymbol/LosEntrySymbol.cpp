@@ -1,5 +1,7 @@
 #include "LosEntrySymbol.h"
 #include "LosLua/LosLua.h"
+#include "godot_cpp/classes/engine.hpp"
+#include "godot_cpp/core/memory.hpp"
 
 extern "C"
 {
@@ -13,6 +15,9 @@ extern "C"
         return init_obj.init();
     }
 }
+
+// 全局单例 C++ 状态类
+static LosDiana::LosLua * LosLuaInstance = nullptr;
 
 
 
@@ -28,6 +33,9 @@ void LosEntrySymbolInit(godot::ModuleInitializationLevel p_level)
 
     // 注册 LosLua
     godot::ClassDB::register_class<LosDiana::LosLua>();
+
+    LosLuaInstance = memnew(LosDiana::LosLua);
+    godot::Engine::get_singleton()->register_singleton("LosLuaInstance", LosLuaInstance);
 }
 
 
@@ -41,4 +49,11 @@ void LosEntrySymbolUninit(godot::ModuleInitializationLevel p_level)
 {
     if (p_level != godot::MODULE_INITIALIZATION_LEVEL_SCENE)
         return;
+
+    if(LosLuaInstance != nullptr)
+    {
+        godot::Engine::get_singleton()->unregister_singleton("LosLuaInstance");
+        memdelete(LosLuaInstance);
+        LosLuaInstance = nullptr;
+    }
 }

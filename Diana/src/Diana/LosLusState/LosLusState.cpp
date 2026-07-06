@@ -21,7 +21,9 @@ namespace LosDiana
      * @brief Destroy the Los Lua State:: Los Lua State object
      */
     LosLuaState::~LosLuaState()
-    { lua_close(L_L); }
+    {
+        lua_close(L_L);
+    }
 
 
 
@@ -31,7 +33,9 @@ namespace LosDiana
      * @return lua_State*
      */
     lua_State *LosLuaState::state()
-    { return L_L; }
+    {
+        return L_L;
+    }
 
 
 
@@ -42,7 +46,9 @@ namespace LosDiana
      * @return int
      */
     int LosLuaState::doString(const char *s)
-    { return luaL_dostring(L_L, s); }
+    {
+        return luaL_dostring(L_L, s);
+    }
 
 
 
@@ -66,7 +72,34 @@ namespace LosDiana
      * @return int
      */
     int LosLuaState::doFile(const char *file)
-    { return luaL_dofile(L_L, file); }
+    {
+        return luaL_dofile(L_L, file);
+    }
+
+    
+
+    /**
+     * @brief
+     *
+     * @param pos
+     * @return true
+     * @return false
+     */
+    bool LosLuaState::isTable(int pos)
+    {
+        return lua_istable(L_L, pos);
+    }
+
+
+
+    /**
+     * @brief 弹出栈顶
+     */
+    void LosLuaState::pop(int number)
+    {
+        lua_pop(L_L, number);
+    }
+
 
 
 } // namespace LosDiana

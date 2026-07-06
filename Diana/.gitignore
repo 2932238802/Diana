@@ -1,3 +1,13 @@
-# Godot 4+ specific ignores
-.godot/
-/android/
+Diana/src/godot-cpp/
+Diana/src/Lua/
+Diana/bin/
+*.obj
+*.o
+*.os
+Diana/compile_commands.json
+Diana/.sconsign.dblite
+Diana/**/.sconsign.dblite
+Diana/.godot/
+.vscode/
+Thumbs.db
+.DS_Store

@@ -84,10 +84,7 @@
 - 环境：Python 3.13 / SCons 4.10 / MSVC(VS in F:\VisualStdio) / Godot 4.7 (F:\Godot)
 
 ---
-
-## 4. 目录结构
-
-> **⚠️ 项目已迁移！当前根目录 = `D:\PR\Diana\Diana`（project.godot 所在层）。已建 git 仓库。**
+当前项目置在 "D:\LosAngelous\Los\Diana"
 
 ### 4.1 当前实际结构（已按功能模块重构完成 ✅）
 ```
@@ -151,6 +148,46 @@ res://
 
 ---
 
+## 4.5 🧭 架构决策必须面向未来（作者 2026-07-06 强调，最高优先级原则）
+
+> **作者明确要求**：以后 AI 的所有回答，**不要只基于"眼前能跑通"**，必须**站在整个项目未来的架构高度**给方案，帮作者**少走弯路、不返工**。
+
+### 核心原则
+- **面向未来，不面向当下**：设计任何系统前，先问"这个东西以后会有几种/几个/怎么扩展"，按最终形态定架构，再退回到当前最小实现。
+- **一次定对，避免重构**：宁可前期多想清楚职责边界，也不要"先耦合跑通、以后再拆"。作者接受"想清楚再动手"的节奏。
+- **正规做法 > 临时凑合**：能用引擎/语言的正规机制解决的，不用 hack 或临时包一层的做法（例：C++ 类做 autoload 单例，直接在 C++ 层用 `register_singleton` 声明，而不是用 .tscn 包一层临时顶上）。
+- **给方案时必须说明"未来会怎样"**：解释一个设计时，要讲清它在"多敌人/多关卡/海量单位/热更"等未来场景下如何演化，而不是只说当前这一步。
+
+### 三层数据驱动架构（Lua 敌人/关卡系统的既定方向，务必遵守）
+```
+Lua 数据文件（内容层）
+  enemy_1.lua (怪属性表)  /  level_1.lua (关卡刷怪表)
+		↓ 读取
+LosLua (C++ 数据访问层)  —— ★只吐 Dictionary 数据，绝不 instantiate 游戏对象
+		↓ Dictionary
+LosLevel (GDScript 总指挥/管理层) —— 读关卡表、生成敌人、setup_from_config 分发、L_enemies[] 管理
+		↓ setup_from_config(config)
+LosEnemy (GDScript 实体层) —— ★被动接收 config，只管自己表现/移动，不知道数据从哪来
+```
+**三条铁律**：
+1. LosLua 只吐数据，绝不创建/持有游戏对象（数据访问层与实体层永不直接对话）。
+2. LosLevel 是唯一"总指挥"，负责生成、分发、管理敌人（持有 `L_enemies[]`）。
+3. LosEnemy 被动接收（依赖注入），不主动找数据源，方便换数据源/测试。
+
+**扩展性目标（最终形态）**：
+- 加新怪 = 加一个 `enemy_X.lua`，C++/GDScript 一行不改
+- 加新关卡 = 加一个 `level_X.lua`（含 spawns 列表），代码不改
+- 调难度 = 改 lua 文本的 count/数值，不动代码
+- 性能：敌人属性配置应"读一次缓存复用"，不要每刷一只怪都重读 Lua 文件（面向海量单位）
+
+### 关于 LosLua 单例（2026-07-06 决策：走 C++ 层正规 autoload）
+- **决策**：LosLua 作为全局 Lua 环境基础设施，做成 **autoload 单例**，全程只有一个 `lua_State`，所有关卡共用；**不随关卡场景生生死死**（换关卡不该重建 Lua 环境，有创建/销毁成本）。
+- **实现方式（作者选定：C++ 层直接声明，非 .tscn 临时包一层）**：
+  在 GDExtension 初始化回调里，用 `godot::Engine::get_singleton()->register_singleton("LosLua", instance)` 注册；在终止回调里 `unregister_singleton` 并释放。详见「§8.2 C++ GDExtension autoload 单例」。
+- **连带影响**：Level 场景里**不再挂 LosLua 子节点**；GDScript 里从 `$LosLua.xxx` 改为全局 `LosLua.xxx`（与 LosRouter/LosPlayerState 一致，不带 `$`）。
+
+---
+
 ## 5. 作者背景与协作规范（重要！）
 
 ### 作者技术底子
@@ -172,6 +209,11 @@ res://
 - 给移动/逻辑时，**给"零件"和思路，不给完整答案**，除非作者明确说"你来写/你帮我改"。
 - **重视原理与架构**：多用作者熟悉的 C++ 概念类比（继承、成员、解耦等）。
 - **循序渐进**：每一步必须跑通再进入下一步，不跑通不往下走（避免连环出错）。
+
+### ⚠️ AI 操作边界（作者 2026-07-06 明确强调，务必遵守）
+- **编译工作 AI 不做**：不主动运行 `scons` / `python -m SCons` 等任何编译/构建命令。编译由作者自己执行，AI 只提供编译指令文本、讲原理、看报错。
+- **不随便动本地文件**：除 `.tscn` 和 `AGENTS.md`（作者明确要求记录时）外，AI 不主动创建/修改/移动任何本地文件（包括不主动跑构建产生文件）。需要改动时，先说明、给内容，由作者自己动手。
+- **例外**：作者明确说"你来做/你帮我改/你移动"时，AI 才执行对应操作。
 
 ### 已纠正的编码习惯
 - GDScript **不写分号 `;`**（C++ 习惯，需改掉）
@@ -260,27 +302,179 @@ res://
 
 ---
 
-## 7. 当前 player.gd 目标形态（参考）
+## 6.5 🎉 里程碑：Lua 数据驱动全链路打通（2026-07-06）
 
-```gdscript
-extends CharacterBody2D
+### ✅ 已完成：Lua → C++ → GDScript → 敌人 数据驱动全链路
+1. **C++ GDExtension 编译链路跑通**（SCons + libdiana.dll），集成 Lua 5.4 源码到 `src/Lua/`
+2. **LosLuaState 封装 lua_State**：doFile/doString/isTable/pop + 泛型 `getfieldWithPop<T>`（if constexpr 按类型分流 tonumber/tostring）
+3. **LosLua.loadEnemy** 读 `game/data/enemies/enemy_1/enemy_1.lua`，组装成 `godot::Dictionary` 返回给 GDScript
+4. **LosLua 注册为 C++ 引擎单例**（`Engine::register_singleton("LosLuaInstance", ...)`），全局一份 lua_State，不随关卡销毁
+5. **LosEnemy_1.initConfig(config)** 被动接收配置（依赖注入），health/attack/speed 等被 Lua 覆盖
+6. **LosLevel 批量刷怪 + L_enemyArray[] 管理**：_ready 读一次 config，for 循环 addEnemy 复用同一份（已做"读一次缓存复用"优化）
+- ✅ **验证通过**：改 enemy_1.lua 的 speed，怪速度真变 → 数据驱动生效；改 lua 文本即可改怪行为，代码不动
 
-@export var L_speed: float = 200.0
+### ⚠️⚠️ 本阶段踩过的坑（务必记住，以后必复现）
+1. **GDExtension dll 被 Godot 锁定**：改 C++ 后编译，若 Godot 开着，dll 被占用写不进去（会残留 `~libdiana...dll`，或只剩 .lib/.exp 没 .dll）。铁律顺序：**关 Godot → 编译 → 开 Godot**。
+2. **SCons 命令别加 compiledb 目标**：`python -m SCons compiledb=yes compiledb` 只生成 compile_commands.json，不编译 dll！要编译 dll 用 `python -m SCons compiledb=yes`（compiledb=yes 是参数，末尾的 compiledb 是目标）。
+3. **C/C++ 混编 name mangling（LNK2019 unresolved external）**：C++ 里读 Lua 必须用 `lua.hpp`（内部 extern "C" 包了 lua.h），**绝不直接 include `lua.h`/`lauxlib.h`**，否则符号名被 C++ 修饰，链接找不到 Lua 的 C 符号。
+4. **C++ register_singleton 的单例，编辑器自动补全不显示是假象**：补全里看不到 LosLuaInstance 不代表运行时不存在。用 `Engine.has_singleton()` / `Engine.get_singleton("LosLuaInstance")` 运行时验证才是真相。推荐 GDScript 里用 `Engine.get_singleton("LosLuaInstance")` 拿（补全不报红线）。
+5. **单例名不要和类名相同**：类型名 LosLua（register_class）和单例名若都叫 "LosLua" 会冲突（GDScript 把它当类型 → "Cannot call non-static function"）。单例注册成不同名字（LosLuaInstance）。
+6. **String UTF-8 乱码**：`godot::String(lua_tostring(...))` 按 Latin-1 解析导致中文乱码，必须用 `godot::String::utf8(lua_tostring(...))`（静态方法）。
+7. **敌人 visible=false 隐身坑**：日志显示敌人生成成功、位置正确却看不见——检查节点 visible 是否被误设 false。逻辑正常但肉眼不可见时，先查 visible/z_index/位置。
 
-func _ready() -> void:
-	pass
-
-func _physics_process(delta: float) -> void:
-	var direction = Input.get_vector(
-		"move_left",
-		"move_right",
-		"move_up",
-        "move_down"
-	)
-	velocity = direction * L_speed
-	move_and_slide()
-```
+### ⏳ 下一步计划（覆盖下方 §6 旧列表）
+1. **台阶3**：加 enemy_2.lua，验证"加怪不改代码"（addEnemy 传不同 id 即可）
+2. **台阶4**：关卡也用 Lua（level_1.lua 含 spawns 数组）——需先学 C++ 读 Lua 嵌套表/数组（lua_geti / 遍历），是新知识点
+3. 后续：武器/Buff 词条也走 Lua 数据驱动；C++ 优化性能热点
 
 ---
 
-_最后更新：2026-07-04 —— 阶段：玩家移动（进行中）_
+## 7. 讲解「函数作用」的规范（作者 2026-07-06 明确要求，务必遵守）
+
+> **背景**：作者在学习 Lua C API（如 `lua_getfield`）时，反复追问「为什么」。
+> 作者要求：以后 AI 解释任何一个函数的作用时，**必须足够详细，必须让作者真正明白"为什么这样设计、为什么要这么用"**，不能只给一句"它的功能是 XXX"。
+
+### 7.1 解释函数时必须包含的要素（缺一不可）
+1. **一句话本质**：先用最直白的一句话说清它到底"做了什么"（可用作者熟悉的 C++ / Lua 概念类比）。
+2. **函数签名**：写出参数列表和返回值，逐个参数说明含义。
+3. **等价写法/心智模型**：给出它等价于什么更熟悉的写法（例如 `lua_getfield(L,-1,"health")` 等价于 Lua 的 `t["health"]`）。
+4. **为什么这样设计（重点！）**：解释这个函数/机制为什么存在、为什么是这种形式，背后的设计动机（例如 Lua 用栈交换数据、负数索引不依赖栈长度所以方便）。
+5. **执行前后的状态变化**：涉及栈/内存/状态的，必须画出「调用前 → 调用后」的变化（尤其 Lua 栈用 ASCII 图示）。
+6. **配套动作**：说明它通常要和哪些函数搭配（例如 `lua_getfield` 后要 `lua_tonumber` 读值 + `lua_pop` 清栈）。
+7. **坑 / 边界情况**：说明用错会怎样、边界情况如何处理（例如目标不是 table 时会取到 nil 或报错）。
+8. **回到本项目**：结合 Diana 项目的真实文件和真实代码行说明该函数在这里怎么用（标注文件绝对路径）。
+
+### 7.2 硬性要求
+- **"为什么" 优先于 "是什么"**：作者要的是理解原理，不是背 API。每次解释都要回答"为什么这么设计/为什么要这么写"。
+- **多用类比**：优先用作者已掌握的 C++（指针、栈、map、成员函数）和 Lua 概念做类比。
+- **多用图示**：涉及栈、指针、数据流的，用 ASCII 图画出状态，不要只用文字描述。
+- **循序渐进**：先给最朴素能懂的版本，再给更健壮/进阶的写法，不要一上来堆复杂封装。
+- **不跳步**：不要假设作者已经懂中间环节，关键中间步骤要显式写出来。
+
+---
+
+## 8. 已讲解函数速查（学习沉淀，持续补充）
+
+> 记录已经给作者详细讲过的函数，方便后续复习和保持一致口径。
+
+### 8.1 `lua_getfield` —— 从 table 里按字符串 key 取字段
+
+**一句话本质**：在 C++ 里，从 Lua 栈上指定位置的 table 中，取名为 `k` 的字段，并把该字段的**值压到栈顶**。等价于 Lua 的 `t["health"]` 或 `t.health`。
+
+**函数签名**：
+```c
+void lua_getfield(lua_State *L, int index, const char *k);
+```
+- `L`：Lua 状态机（本项目里由 `LosLuaState` 持有，见 LosLusState.h 的 `lua_State *L_L`）。
+- `index`：去栈的哪个位置取（通常是 table 所在位置，如 `-1` 表示栈顶）。
+- `k`：要取的字段名（**只能是字符串 key**）。
+
+**心智模型（等价写法）**：
+```cpp
+lua_getfield(L, -1, "health");   // 等价于 Lua: enemy_table["health"]
+```
+
+**为什么这样设计（重点）**：
+- Lua 和 C 之间不能直接互相返回值，**只能通过一个"栈"来交换数据**。所以 `lua_getfield` 不直接把值 `return` 给 C++ 变量，而是把取到的值**压到栈顶**，再由 `lua_tonumber` / `lua_tostring` 从栈顶读走。
+- 用 `-1`（栈顶）是因为负数索引"从栈顶往下数"，`-1` 永远指向"最后压进去的那个值"，**不依赖栈里到底有几个元素**，写 C 代码时最方便。
+
+**执行前后的栈变化**（以本项目 enemy_1.lua 为例）：
+```
+调用前：
+-1  [ enemy_table ]          ← doFile 后，Lua return 的 table 在栈顶
+
+执行 lua_getfield(L, -1, "health");
+
+调用后：
+-1  [ 30 ]                   ← health 的值被压到新栈顶
+-2  [ enemy_table ]          ← 原 table 被挤到第二位（-2）
+```
+
+**配套动作（三步节奏，缺一不可）**：
+```cpp
+lua_getfield(L, -1, "health");        // 1. 取字段，值压栈
+double hp = lua_tonumber(L, -1);      // 2. 从栈顶读出值
+lua_pop(L, 1);                        // 3. 弹掉该值，让 table 重新回到 -1
+```
+> 若不 `lua_pop`，下一次 `lua_getfield(L, -1, ...)` 的 `-1` 就不再是 table 而是上一个字段值，会取错。
+
+**坑 / 边界情况**：
+- `lua_getfield` **不检查** index 位置是不是 table。如果那里不是 table：
+  - Lua 5.4 对普通 number/boolean 取字段会**直接报错**（`attempt to index a number value`）。
+  - 就算不报错，也只会压一个 `nil`，`lua_tonumber` 读出来是 `0`，造成"脏数据 bug"。
+- 因此取字段前**必须先判断类型**：
+```cpp
+if (!lua_istable(L, -1)) { lua_pop(L, 1); return result; }
+```
+- `lua_getfield` 只能取 **string key**。若是数组（number key）要用 `lua_geti(L, index, 1)`；动态 key 用 `lua_gettable`。
+- 想避免连续取字段时栈乱，可先 `int idx = lua_absindex(L, -1);` 把 table 位置钉成正数，之后一直用 `idx`。
+
+**回到本项目**：见 <D:\LosAngelous\Los\Diana\Diana\src\Diana\LosLua\LosLua.cpp> 的 `LosLua::loadEnemy`，读取 enemy_1.lua（<D:\LosAngelous\Los\Diana\Diana\game\data\enemies\enemy_1\enemy_1.lua>）的 `health/attack/speed` 等字段，组装成 `godot::Dictionary` 返回给 GDScript。
+
+---
+
+### 8.2 C++ GDExtension autoload 单例（正规做法，本项目选定方案）
+
+**一句话本质**：让一个 C++ GDExtension 类（如 LosLua）在游戏启动时自动创建一个全局唯一实例，并注册进引擎的单例表，之后 GDScript 用全局名 `LosLua.xxx()` 直接访问——全程只有一个实例、一个 `lua_State`。
+
+**为什么不用 .tscn 包一层（临时做法的问题）**：
+- .tscn 包一层是"把一个 LosLua 节点塞进场景当 autoload"，属于折中方案；实例是"场景节点"，语义上仍是节点树的一部分。
+- 作者选定**在 C++ 层直接声明单例**，语义更清晰（它就是引擎级基础设施，不是某个场景的节点），也不依赖手工维护的 .tscn，符合"正规做法 > 临时凑合"原则。
+
+**核心 API**：
+```cpp
+#include "godot_cpp/classes/engine.hpp"
+godot::Engine::get_singleton()->register_singleton("LosLua", instance);   // 注册
+godot::Engine::get_singleton()->unregister_singleton("LosLua");           // 注销
+```
+- `register_singleton(name, ptr)`：把 `ptr` 指向的对象注册成名为 `name` 的全局单例，GDScript 里即可用 `name.xxx()` 访问。
+- 单例实例需**自己 new 出来并持有指针**，在扩展卸载时 `unregister_singleton` + `memdelete` 释放。
+
+**实现步骤（写在入口注册文件）**：
+👉 <D:\LosAngelous\Los\Diana\Diana\src\Diana\LosEntrySymbol\LosEntrySymbol.cpp>
+
+```cpp
+#include "godot_cpp/classes/engine.hpp"
+// ...
+
+static LosDiana::LosLua *g_los_lua_singleton = nullptr;   // 持有单例指针
+
+void LosEntrySymbolInit(godot::ModuleInitializationLevel p_level)
+{
+	if (p_level != godot::MODULE_INITIALIZATION_LEVEL_SCENE)
+		return;
+
+	godot::ClassDB::register_class<LosDiana::LosLua>();    // 1. 先注册类型
+
+	g_los_lua_singleton = memnew(LosDiana::LosLua);        // 2. 创建唯一实例
+	godot::Engine::get_singleton()->register_singleton("LosLua", g_los_lua_singleton); // 3. 注册为全局单例
+}
+
+void LosEntrySymbolUninit(godot::ModuleInitializationLevel p_level)
+{
+	if (p_level != godot::MODULE_INITIALIZATION_LEVEL_SCENE)
+		return;
+
+	if (g_los_lua_singleton != nullptr)                    // 4. 卸载时注销+释放
+	{
+		godot::Engine::get_singleton()->unregister_singleton("LosLua");
+		memdelete(g_los_lua_singleton);
+		g_los_lua_singleton = nullptr;
+	}
+}
+```
+
+**坑 / 注意（务必记住）**：
+- **注册时机**：`register_singleton` 必须在类型已 `register_class` 之后，且在 `MODULE_INITIALIZATION_LEVEL_SCENE` 层做（此时引擎 Engine 单例可用）。
+- **内存管理**：用 `memnew` / `memdelete`（Godot 内存宏），不要用裸 `new`/`delete`。init 里创建、uninit 里销毁，成对出现，否则内存泄漏或悬空。
+- **名字唯一**：注册名 `"LosLua"` 不能和已有 autoload（LosRouter/LosPlayerState）或其他单例重名。
+- **连带修改**：
+  - Level 场景（LosLevel.tscn）里**删掉** LosLua 子节点（否则场景里又多一个实例，和单例重复）。
+  - GDScript 里所有 `$LosLua.xxx` 改成 `LosLua.xxx`（全局名，不带 `$`），与 LosRouter/LosPlayerState 写法一致。
+- **生命周期**：单例随扩展加载而生、随扩展卸载而灭，横跨所有场景/关卡，`lua_State` 全程唯一——这正是"Lua 环境不随关卡生生死死"的目标。
+
+**验证**：任意脚本（LosLevel.gd / LosPlayer.gd）里 `LosLua.lLuaLoadEnemy("enemy_1")` 都能调通且共享同一状态机，即单例成功。
+
+**回到本项目**：LosLua 类见 <D:\LosAngelous\Los\Diana\Diana\src\Diana\LosLua\LosLua.h>；注册入口见 <D:\LosAngelous\Los\Diana\Diana\src\Diana\LosEntrySymbol\LosEntrySymbol.cpp>；GDScript 调用点见 <D:\LosAngelous\Los\Diana\Diana\game\levels\LosLevel.gd>。
+
+---

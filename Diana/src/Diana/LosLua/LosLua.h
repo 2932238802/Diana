@@ -4,6 +4,7 @@
 #include "godot_cpp/classes/wrapped.hpp"
 
 #include "LosLusState/LosLusState.h"
+#include "godot_cpp/variant/dictionary.hpp"
 #include "godot_cpp/variant/string.hpp"
 
 namespace LosDiana
@@ -21,7 +22,7 @@ namespace LosDiana
 
       public: // lua
         int hello();
-        bool loadEnemy(godot::String enemy_id);
+        godot::Dictionary loadEnemy(godot::String enemy_id);
 
       private:
         LosLuaState LOS_state;

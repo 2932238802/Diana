@@ -19,6 +19,7 @@ func shoot() -> void:
 	get_parent().add_child(bullet)
 
 
+
 # 加载
 func _ready() -> void:
 	target_position = global_position

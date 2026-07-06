@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b3barj1rvpvcf" path="res://game/levels/LosLevel.gd" id="1_6ffw3"]
 [ext_resource type="PackedScene" uid="uid://wmdghlh3c27u" path="res://game/ui/LosHud/LosHud.tscn" id="1_gykle"]
 [ext_resource type="PackedScene" uid="uid://0o75n43ttagw" path="res://game/features/player/LosPlayer/LosPlayer.tscn" id="2_6ffw3"]
+[ext_resource type="PackedScene" uid="uid://cbd42h67rkeke" path="res://game/features/enemy/LosEnemy/LosEnemy.tscn" id="2_xw602"]
 [ext_resource type="Script" uid="uid://5n8gf5ww108a" path="res://game/systems/LosCamera.gd" id="3_m4jom"]
 
 [sub_resource type="RectangleShape2D" id="Shape_TopBottom"]
@@ -13,6 +14,7 @@ size = Vector2(40, 1880)
 
 [node name="Level" type="Node2D" unique_id=1772159285]
 script = ExtResource("1_6ffw3")
+L_enemyScene = ExtResource("2_xw602")
 
 [node name="State" parent="." unique_id=1784031789 instance=ExtResource("1_gykle")]
 
@@ -71,5 +73,3 @@ shape = SubResource("Shape_LeftRight")
 [node name="Polygon2D" type="Polygon2D" parent="Walls/WallRight" unique_id=100000013]
 color = Color(0.4, 0.25, 0.15, 1)
 polygon = PackedVector2Array(-20, -940, 20, -940, 20, 940, -20, 940)
-
-[node name="LosLua" type="LosLua" parent="." unique_id=1609771215]

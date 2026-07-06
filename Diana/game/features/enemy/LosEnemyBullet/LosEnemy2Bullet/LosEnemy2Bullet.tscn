@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://chfb7wtpavrvt"]
+
+[ext_resource type="Texture2D" uid="uid://lvgb37x4uef7" path="res://game/assets/monster/enemy_2/enemy_2.png" id="1_1lr2y"]
+[ext_resource type="Script" uid="uid://b1s6wgp3nufpq" path="res://game/features/enemy/LosEnemyBullet/LosEnemy2Bullet/LosEnemy2Bullet.gd" id="1_t83gd"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t83gd"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(0, 320, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sjdo7"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(32, 320, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hq6bc"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(64, 320, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p8a8w"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(96, 320, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0sxya"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(128, 320, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xiktd"]
+atlas = ExtResource("1_1lr2y")
+region = Rect2(160, 320, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3mjjt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t83gd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sjdo7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hq6bc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p8a8w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0sxya")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xiktd")
+}],
+"loop": 1,
+"name": &"bullet",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_npgp5"]
+radius = 8.0
+
+[node name="LosEnemy2Bullet" type="Area2D" unique_id=1044546789]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("1_t83gd")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1186746956]
+sprite_frames = SubResource("SpriteFrames_3mjjt")
+animation = &"bullet"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1087068371]
+visible = false
+shape = SubResource("CircleShape2D_npgp5")
+debug_color = Color(0.7081875, 0.36928824, 0.813006, 0.41960785)
