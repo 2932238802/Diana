@@ -30,10 +30,8 @@ void LosEntrySymbolInit(godot::ModuleInitializationLevel p_level)
 {
     if (p_level != godot::MODULE_INITIALIZATION_LEVEL_SCENE)
         return;
-
     // 注册 LosLua
     godot::ClassDB::register_class<LosDiana::LosLua>();
-
     LosLuaInstance = memnew(LosDiana::LosLua);
     godot::Engine::get_singleton()->register_singleton("LosLuaInstance", LosLuaInstance);
 }

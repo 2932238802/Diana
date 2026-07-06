@@ -1,15 +1,12 @@
 extends CharacterBody2D
-
-@export var L_speed: float = 400.0
+@export var L_speed: float = 400.0 
 @export var L_bulletScene: PackedScene
 @export var L_fireRate: float = 0.15 
-
 var L_fireTimer: float = 0.0  
-
 # $AimLine = get_node("AimLine")           
 @onready var aim_line = $AimLine        
-
 var target_position: Vector2 
+
 
 # 射击 函数
 func shoot() -> void:
