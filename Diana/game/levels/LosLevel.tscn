@@ -6,10 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://cbd42h67rkeke" path="res://game/features/enemy/LosEnemy/LosEnemy.tscn" id="2_xw602"]
 [ext_resource type="Script" uid="uid://5n8gf5ww108a" path="res://game/systems/LosCamera.gd" id="3_m4jom"]
 [ext_resource type="TileSet" uid="uid://c110f52eog37m" path="res://game/assets/tiles/level_base_tiles.tres" id="6_iet2b"]
+[ext_resource type="Script" uid="uid://5b31sbcmajl1" path="res://game/systems/LosEnemySpawner.gd" id="7_xagrw"]
 
 [node name="Level" type="Node2D" unique_id=1772159285]
 script = ExtResource("1_6ffw3")
-L_enemyScene = ExtResource("2_xw602")
 
 [node name="State" parent="." unique_id=1784031789 instance=ExtResource("1_gykle")]
 
@@ -21,3 +21,8 @@ position = Vector2(0, 200)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=200000001]
 script = ExtResource("3_m4jom")
+
+[node name="LosEnemySpawner" type="Node" parent="." unique_id=1249815154]
+script = ExtResource("7_xagrw")
+L_enemyScene = ExtResource("2_xw602")
+metadata/_custom_type_script = "uid://5b31sbcmajl1"
